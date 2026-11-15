@@ -11,6 +11,7 @@ final readonly class SendResult
         public ?string $reference = null,
         public ?string $errorCode = null,
         public ?string $errorMessage = null,
+        public bool $retryable=false,
     ) {}
 
     public static function accepted(string $reference): self
@@ -18,8 +19,8 @@ final readonly class SendResult
         return new self(accepted: true, reference: $reference);
     }
 
-    public static function rejected(string $errorCode, string $errorMessage): self
+    public static function rejected(string $errorCode, string $errorMessage, bool $retryable=false): self
     {
-        return new self(accepted: false, errorCode: $errorCode, errorMessage: $errorMessage);
+        return new self(accepted: false, errorCode: $errorCode, errorMessage: $errorMessage, retryable: $retryable);
     }
 }

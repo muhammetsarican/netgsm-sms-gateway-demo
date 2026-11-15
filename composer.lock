@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "01d79301a339e6d21eac243a11d0906e",
+    "content-hash": "c8bc4b2bcf77919e1998d15185092ff0",
     "packages": [
         {
             "name": "brick/math",
@@ -2337,6 +2337,47 @@
             ],
             "time": "2026-10-25T14:32:48+00:00",
             "published-time": "2026-10-25T14:41:05+00:00"
+        },
+        {
+            "name": "netgsm/sms",
+            "version": "v2.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/netgsm1/sms.git",
+                "reference": "3060a6cfecd7aebabfe6f9b195ed0ba9fc96622e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/netgsm1/sms/zipball/3060a6cfecd7aebabfe6f9b195ed0ba9fc96622e",
+                "reference": "3060a6cfecd7aebabfe6f9b195ed0ba9fc96622e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.5"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "Netgsm\\Sms\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Netgsm",
+                    "email": "teknikdestek@netgsm.com.tr"
+                }
+            ],
+            "description": "Netgsm Sms ",
+            "support": {
+                "issues": "https://github.com/netgsm1/sms/issues",
+                "source": "https://github.com/netgsm1/sms/tree/v2.0.8"
+            },
+            "time": "2025-05-20T11:23:17+00:00",
+            "published-time": "2025-05-21T10:38:28+00:00"
         },
         {
             "name": "nette/schema",

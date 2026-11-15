@@ -7,6 +7,8 @@ use App\Sms\Gateways\FakeGateway;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
+use Netgsm\Sms\SmsSend;
+use Psr\Log\LoggerInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
 
             return match (config('sms.driver')) {
                 'fake' => new FakeGateway($logger),
+                'netgsm' => $this->makeNetgsmGateway($logger),
                 default => throw new InvalidArgumentException(
                     'Bilinmeyen SMS driver: '.config('sms.driver')
                 )
@@ -34,5 +37,23 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+    }
+
+    private function makeNetgsmGateway(LoggerInterface $logger): NetgsmGateway
+    {
+        $config = config('sms.netgsm');
+
+        foreach (['usercode', 'password', 'header'] as $key) {
+            if (blank($config[$key] ?? null)) {
+                throw new InvalidArgumentException("Netgsm yapılandırması eksik: sms.netgsm.{$key}");
+            }
+        }
+
+        return new NetgsmGateway(
+            client: new SmsSend,
+            logger: $logger,
+            defaultHeader: $config['header'],
+            iysFilter: (string) $config['iys_filter'],
+        );
     }
 }
