@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Psr\Log\AbstractLogger;
 use Tests\TestCase;
 
 /*
@@ -44,7 +45,20 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function spyLogger(): AbstractLogger
 {
+
+    return new class extends AbstractLogger
+    {
+        /**
+         * @var list<array{level: mixed, mesage:string, context: array<mixed>}>
+         */
+        public array $records = [];
+
+        public function log($level, $message, array $context = []): void
+        {
+            $this->records[] = ['level' => $level, 'message' => (string) $message, 'context' => $context];
+        }
+    };
     // ..
 }

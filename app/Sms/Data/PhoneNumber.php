@@ -44,7 +44,7 @@ final readonly class PhoneNumber
 
     public function masked(): string
     {
-        return '+90'.substr($this->value, 2, 3).' *** **'.substr($this->value, -2);
+        return '+90 '.substr($this->value, 2, 3).' *** ** '.substr($this->value, -2);
     }
 
     public function equals(self $other): bool
