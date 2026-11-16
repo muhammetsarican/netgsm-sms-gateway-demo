@@ -13,7 +13,7 @@ class SmsCampaign extends Model
         'type',
         'body',
         'header',
-        'total_receipients',
+        'total_recipients',
     ];
 
     protected function casts():array{
