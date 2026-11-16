@@ -23,6 +23,7 @@ function netgsmGateway(SmsSend $client, $logger = null): NetgsmGateway
 }
 
 it('Netgsm\'e doğru biçimde istek gönderir ve bulkid döner', function () {
+    $payload = [];
     $client = fakeNetgsmClient(['code' => '00', 'bulkid' => '1311033503'], $payload);
 
     $result = netgsmGateway($client)->send(OutgoingSms::single('0532 123 45 67', 'Merhaba'));
@@ -36,6 +37,7 @@ it('Netgsm\'e doğru biçimde istek gönderir ve bulkid döner', function () {
 });
 
 it('Türkçe karakter varsa TR encoding kullanır', function () {
+    $payload = [];
     $client = fakeNetgsmClient(['code' => '00', 'bulkid' => '1'], $payload);
 
     netgsmGateway($client)->send(OutgoingSms::single('05321234567', 'Merhaba', header: 'KAMPANYA'));
@@ -44,6 +46,7 @@ it('Türkçe karakter varsa TR encoding kullanır', function () {
 });
 
 it('mesajdaki başlık varsayılan başlığı ezer', function () {
+    $payload = [];
     $client = fakeNetgsmClient(['code' => '00', 'bulkid' => '1'], $payload);
 
     netgsmGateway($client)->send(OutgoingSms::single('05321234567', 'Merhaba', header: 'KAMPANYA'));
@@ -82,7 +85,7 @@ it('loga açık numara ve mesaj metni yazmaz', function (){
 
   netgsmGateway(fakeNetgsmClient(['code'=>'00', 'bulkid'=>'1']),$logger)->send(OutgoingSms::single('05321234567','Kodunuz: 482910'));
 
-  $logged=json_encode($logger->records, JSON_UNESCAPED_UNICODE);
+    $logged=json_encode(get_object_vars($logger)['records'] ?? [], JSON_UNESCAPED_UNICODE);
 
   expect($logged)->not->toContain('05321234567')->and($logged)->not->toContain('482910');
 });

@@ -9,7 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
 use Netgsm\Sms\SmsSend;
 use Psr\Log\LoggerInterface;
-
+use App\Sms\Gateways\Netgsm\NetgsmGateway;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         $this->app->singleton(SmsGateway::class, function (Application $app): SmsGateway {
-            $logger = $app['log']->channel(config('sms.log_channel'));
+            $logger = $app->make('log')->channel(config('sms.log_channel'));
 
             return match (config('sms.driver')) {
                 'fake' => new FakeGateway($logger),
