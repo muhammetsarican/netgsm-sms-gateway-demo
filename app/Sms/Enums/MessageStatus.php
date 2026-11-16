@@ -8,7 +8,7 @@ enum MessageStatus: string
 {
     case Pending = 'pending';
     case Sending = 'sending';
-    case Send = 'sent';
+    case Sent = 'sent';
     case Delivered = 'delivered';
     case Failed = 'failed';
     case Unknown = 'unknown';
