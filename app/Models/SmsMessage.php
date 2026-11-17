@@ -23,26 +23,29 @@ class SmsMessage extends Model
         'delivered_at',
     ];
 
-    protected $attributes=[
-        'status'=>MessageStatus::Pending->value,
-        'attempts'=>0,
+    protected $attributes = [
+        'status' => MessageStatus::Pending->value,
+        'attempts' => 0,
     ];
 
-    protected function casts():array{
+    protected function casts(): array
+    {
         return [
-            'status'=>MessageStatus::class,
-            'attempts'=>'integer',
-            'sent_at'=>'datetime',
-            'delivered_at'=>'datetime',
+            'status' => MessageStatus::class,
+            'attempts' => 'integer',
+            'sent_at' => 'datetime',
+            'delivered_at' => 'datetime',
         ];
     }
 
     /** @return BelongsTo<SmsCampaign, $this>  */
-    public function campaign():BelongsTo{
+    public function campaign(): BelongsTo
+    {
         return $this->belongsTo(SmsCampaign::class, 'sms_campaign_id');
     }
 
-    public function phoneNumber():PhoneNumber{
+    public function phoneNumber(): PhoneNumber
+    {
         return PhoneNumber::from($this->phone);
     }
 }

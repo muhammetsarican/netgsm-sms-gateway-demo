@@ -15,12 +15,12 @@ it('bilinmeyen driver açık bir hata verir', function () {
     expect(fn () => app(SmsGateway::class))->toThrow(InvalidArgumentException::class, 'Bilinmeyen SMS driver: olmayan-driver');
 });
 
-it('netgsm driver kimlik bilgileri eksikse açılışta hata verir', function(){
-  config([
-    'sms.driver'=>'netgsm',
-    'sms.netgsm.usercode'=>null,
-  ]);
+it('netgsm driver kimlik bilgileri eksikse açılışta hata verir', function () {
+    config([
+        'sms.driver' => 'netgsm',
+        'sms.netgsm.usercode' => null,
+    ]);
 
-  expect(fn()=>app(SmsGateway::class))
-  ->toThrow(InvalidArgumentException::class,'Netgsm yapılandırması eksik: sms.netgsm.usercode');
+    expect(fn () => app(SmsGateway::class))
+        ->toThrow(InvalidArgumentException::class, 'Netgsm yapılandırması eksik: sms.netgsm.usercode');
 });

@@ -16,15 +16,17 @@ class SmsCampaign extends Model
         'total_recipients',
     ];
 
-    protected function casts():array{
+    protected function casts(): array
+    {
         return [
-            'type'=>CampaignType::class,
-            'total_recipients'=>'integer',
+            'type' => CampaignType::class,
+            'total_recipients' => 'integer',
         ];
     }
 
     /** @return HasMany<SmsMessage, $this>  */
-    public function messages():HasMany{
+    public function messages(): HasMany
+    {
         return $this->hasMany(SmsMessage::class);
     }
 }

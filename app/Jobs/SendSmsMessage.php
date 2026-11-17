@@ -17,14 +17,12 @@ class SendSmsMessage implements ShouldQueue
 {
     use Queueable;
 
-    public int $tries=5;
+    public int $tries = 5;
 
-    /** @var list<int>  */
-    public array $backoff=[10,30,60,120];
+    /** @var list<int> */
+    public array $backoff = [10, 30, 60, 120];
 
-    public function __construct(public readonly int $messageId)
-    {
-    }
+    public function __construct(public readonly int $messageId) {}
 
     /**
      * Execute the job.
@@ -32,58 +30,60 @@ class SendSmsMessage implements ShouldQueue
     public function handle(SmsGateway $gateway): void
     {
         //
-        $claimed=SmsMessage::query()->whereKey($this->messageId)->where('status', MessageStatus::Pending->value)->update([
-            'status'=>MessageStatus::Sending->value,
-            'attempts'=>DB::raw('attempts+1'),
+        $claimed = SmsMessage::query()->whereKey($this->messageId)->where('status', MessageStatus::Pending->value)->update([
+            'status' => MessageStatus::Sending->value,
+            'attempts' => DB::raw('attempts+1'),
         ]);
 
-        if($claimed===0){return;}
+        if ($claimed === 0) {
+            return;
+        }
 
-        $message=SmsMessage::query()->with('campaign')->findOrFail($this->messageId);
+        $message = SmsMessage::query()->with('campaign')->findOrFail($this->messageId);
 
-        try{
-            $result=$gateway->send(new OutgoingSms(
-                recipients:[$message->phoneNumber()],
-                body:$message->campaign->body,
-                header:$message->campaign->header,
+        try {
+            $result = $gateway->send(new OutgoingSms(
+                recipients: [$message->phoneNumber()],
+                body: $message->campaign->body,
+                header: $message->campaign->header,
             ));
-        }catch(GatewayUnavailableException $e){
+        } catch (GatewayUnavailableException $e) {
             $message->update([
-                'status'=>MessageStatus::Unknown,
-                'error_message'=>$e->getMessage(),
+                'status' => MessageStatus::Unknown,
+                'error_message' => $e->getMessage(),
             ]);
 
             return;
         }
 
-        if($result->accepted){
+        if ($result->accepted) {
             $message->update([
-                'status'=>MessageStatus::Sent,
-                'provider_reference'=>$result->reference,
-                'error_code'=>null,
-                'error_message'=>null,
-                'sent_at'=>now(),
+                'status' => MessageStatus::Sent,
+                'provider_reference' => $result->reference,
+                'error_code' => null,
+                'error_message' => null,
+                'sent_at' => now(),
             ]);
 
             return;
         }
 
-        if($result->retryable && $this->attempts()<$this->tries){
+        if ($result->retryable && $this->attempts() < $this->tries) {
             $message->update([
-                'status'=>MessageStatus::Pending,
-                'error_code'=>$result->errorCode,
-                'error_message'=>$result->errorMessage,
+                'status' => MessageStatus::Pending,
+                'error_code' => $result->errorCode,
+                'error_message' => $result->errorMessage,
             ]);
 
-            $this->release($this->backoff[$this->attempts()-1]??120);
+            $this->release($this->backoff[$this->attempts() - 1] ?? 120);
 
             return;
         }
 
         $message->update([
-            'status'=>MessageStatus::Failed,
-            'error_code'=>$result->errorCode,
-            'error_message'=>$result->errorMessage,
+            'status' => MessageStatus::Failed,
+            'error_code' => $result->errorCode,
+            'error_message' => $result->errorMessage,
         ]);
     }
 }

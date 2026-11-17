@@ -5,15 +5,15 @@ namespace App\Providers;
 use App\Sms\Contracts\SmsGateway;
 use App\Sms\Data\PhoneNumber;
 use App\Sms\Gateways\FakeGateway;
+use App\Sms\Gateways\Netgsm\NetgsmGateway;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
 use Netgsm\Sms\SmsSend;
 use Psr\Log\LoggerInterface;
-use App\Sms\Gateways\Netgsm\NetgsmGateway;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,8 +42,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-        RateLimiter::for('sms-send', function(Request $request){
-            $phone=PhoneNumber::tryFrom((string) $request->input('phone'))?->value??'invalid';
+        RateLimiter::for('sms-send', function (Request $request) {
+            $phone = PhoneNumber::tryFrom((string) $request->input('phone'))?->value ?? 'invalid';
 
             return [
                 Limit::perMinute(30)->by('ip:'.$request->ip()),

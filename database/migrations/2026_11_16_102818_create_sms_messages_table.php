@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('sms_messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sms_campaign_id')->constrained()->cascadeOnDelete();
-            $table->string('phone',12);
+            $table->string('phone', 12);
             $table->string('status', 20)->default('pending');
-            $table->char('idempotency_key',64)->unique();
-            $table->string('provider_reference',64)->nullable();
+            $table->char('idempotency_key', 64)->unique();
+            $table->string('provider_reference', 64)->nullable();
             $table->string('error_code', 10)->nullable();
             $table->string('error_message')->nullable();
             $table->unsignedTinyInteger('attempts')->default(0);
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('delivered_at')->nullable();
             $table->timestamps();
 
-            $table->index(['sms_campaign_id','status']);
+            $table->index(['sms_campaign_id', 'status']);
             $table->index(['status', 'updated_at']);
             $table->index('provider_reference');
         });

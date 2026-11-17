@@ -31,23 +31,23 @@ class SmsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SendSmsRequest $request, QueneSingleSms $queueSingleSms):JsonResponse
+    public function store(SendSmsRequest $request, QueneSingleSms $queueSingleSms): JsonResponse
     {
         //
-        $message=$queueSingleSms->handle(
-            phone:$request->phoneNumber(),
-            body:$request->string('message')->toString(),
-            header:$request->input('header'),
-            idempotencyKey:$request->header('Idempotency-Key')??(string)Str::uuid(),
+        $message = $queueSingleSms->handle(
+            phone: $request->phoneNumber(),
+            body: $request->string('message')->toString(),
+            header: $request->input('header'),
+            idempotencyKey: $request->header('Idempotency-Key') ?? (string) Str::uuid(),
         );
 
-        return SmsMessageResource::make($message)->response()->setStatusCode(202)->header('Idempotent-Replayed', $message->wasRecentlyCreated?'false':'true');
+        return SmsMessageResource::make($message)->response()->setStatusCode(202)->header('Idempotent-Replayed', $message->wasRecentlyCreated ? 'false' : 'true');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(SmsMessage $message):SmsMessageResource
+    public function show(SmsMessage $message): SmsMessageResource
     {
         //
         return SmsMessageResource::make($message);

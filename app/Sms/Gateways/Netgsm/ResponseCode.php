@@ -26,11 +26,12 @@ enum ResponseCode: string
         };
     }
 
-    public function isRetryable():bool{
-      return match($this){
-        self::SendLimitExceeded, self::DuplicateLimitExceeded=>true,
-        default=>false,
-      };
+    public function isRetryable(): bool
+    {
+        return match ($this) {
+            self::SendLimitExceeded, self::DuplicateLimitExceeded => true,
+            default => false,
+        };
     }
 
     public function description(): string

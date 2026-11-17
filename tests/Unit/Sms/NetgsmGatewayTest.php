@@ -80,12 +80,12 @@ it('tanınmayan yanıtta exception fırlatır', function (array $response) {
     'başarılı ama bulkid yok' => [['code' => '00']],
 ]);
 
-it('loga açık numara ve mesaj metni yazmaz', function (){
-  $logger=spyLogger();
+it('loga açık numara ve mesaj metni yazmaz', function () {
+    $logger = spyLogger();
 
-  netgsmGateway(fakeNetgsmClient(['code'=>'00', 'bulkid'=>'1']),$logger)->send(OutgoingSms::single('05321234567','Kodunuz: 482910'));
+    netgsmGateway(fakeNetgsmClient(['code' => '00', 'bulkid' => '1']), $logger)->send(OutgoingSms::single('05321234567', 'Kodunuz: 482910'));
 
-    $logged=json_encode(get_object_vars($logger)['records'] ?? [], JSON_UNESCAPED_UNICODE);
+    $logged = json_encode(get_object_vars($logger)['records'] ?? [], JSON_UNESCAPED_UNICODE);
 
-  expect($logged)->not->toContain('05321234567')->and($logged)->not->toContain('482910');
+    expect($logged)->not->toContain('05321234567')->and($logged)->not->toContain('482910');
 });

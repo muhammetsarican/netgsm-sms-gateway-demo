@@ -28,22 +28,22 @@ class SendSmsRequest extends FormRequest
     {
         return [
             //
-            'phone'=>[
+            'phone' => [
                 'required',
                 'string',
-                function(string $attribute, mixed $value, Closure $fail):void{
-                    if(!is_string($value)||PhoneNumber::tryFrom($value)===null)
-                        {
-                            $fail('Geçerli bir Türkiye cep telefonu numarası girin');
-                        }
-                }
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    if (! is_string($value) || PhoneNumber::tryFrom($value) === null) {
+                        $fail('Geçerli bir Türkiye cep telefonu numarası girin');
+                    }
+                },
             ],
-            'message'=>['required','string','max:900'],
-            'header'=>['nullable','string','max:11'],
+            'message' => ['required', 'string', 'max:900'],
+            'header' => ['nullable', 'string', 'max:11'],
         ];
     }
 
-    public function phoneNumber():PhoneNumber{
+    public function phoneNumber(): PhoneNumber
+    {
         return PhoneNumber::from($this->string('phone')->toString());
     }
 }

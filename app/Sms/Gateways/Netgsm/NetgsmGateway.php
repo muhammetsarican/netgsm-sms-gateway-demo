@@ -68,7 +68,7 @@ final class NetgsmGateway implements SmsGateway
                 'code' => $code->value,
                 'recipients' => array_map(fn (PhoneNumber $phone) => $phone->masked(), $sms->recipients),
             ]);
-               
+
             return SendResult::accepted($bulkId);
         }
 
@@ -77,9 +77,8 @@ final class NetgsmGateway implements SmsGateway
             'reason' => $code->description(),
         ]);
 
-
-            return SendResult::rejected($code->value, $code->description(), $code->isRetryable());
-        }
+        return SendResult::rejected($code->value, $code->description(), $code->isRetryable());
+    }
 
     private static function needsTurkishEncoding(string $text): bool
     {
