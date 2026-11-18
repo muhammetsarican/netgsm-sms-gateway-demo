@@ -19,7 +19,7 @@ function fakeNetgsmClient(array $response, ?array &$captured = null): SmsSend
 
 function netgsmGateway(SmsSend $client, $logger = null): NetgsmGateway
 {
-    return new NetgsmGateway($client, $logger ?? spyLogger(), defaultHeader: 'DEMO');
+    return new NetgsmGateway($client, $logger ?? spyLogger(), defaultSender: 'DEMO');
 }
 
 it('Netgsm\'e doğru biçimde istek gönderir ve bulkid döner', function () {
@@ -40,7 +40,7 @@ it('Türkçe karakter varsa TR encoding kullanır', function () {
     $payload = [];
     $client = fakeNetgsmClient(['code' => '00', 'bulkid' => '1'], $payload);
 
-    netgsmGateway($client)->send(OutgoingSms::single('05321234567', 'Merhaba', header: 'KAMPANYA'));
+    netgsmGateway($client)->send(OutgoingSms::single('05321234567', 'Merhaba', sender: 'KAMPANYA'));
 
     expect($payload['header'])->toBe('KAMPANYA');
 });
@@ -49,7 +49,7 @@ it('mesajdaki başlık varsayılan başlığı ezer', function () {
     $payload = [];
     $client = fakeNetgsmClient(['code' => '00', 'bulkid' => '1'], $payload);
 
-    netgsmGateway($client)->send(OutgoingSms::single('05321234567', 'Merhaba', header: 'KAMPANYA'));
+    netgsmGateway($client)->send(OutgoingSms::single('05321234567', 'Merhaba', sender: 'KAMPANYA'));
 
     expect($payload['header'])->toBe('KAMPANYA');
 });

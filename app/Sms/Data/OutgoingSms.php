@@ -14,7 +14,7 @@ final readonly class OutgoingSms
     public function __construct(
         public array $recipients,
         public string $body,
-        public ?string $header = null,
+        public ?string $sender = null,
     ) {
         if ($recipients === []) {
             throw new InvalidArgumentException('En az bir alıcı gerekli');
@@ -25,10 +25,10 @@ final readonly class OutgoingSms
         }
     }
 
-    public static function single(PhoneNumber|string $to, string $body, ?string $header = null): self
+    public static function single(PhoneNumber|string $to, string $body, ?string $sender = null): self
     {
         $phone = $to instanceof PhoneNumber ? $to : PhoneNumber::from($to);
 
-        return new self([$phone], $body, $header);
+        return new self([$phone], $body, $sender);
     }
 }

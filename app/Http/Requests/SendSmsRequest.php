@@ -38,7 +38,7 @@ class SendSmsRequest extends FormRequest
                 },
             ],
             'message' => ['required', 'string', 'max:900'],
-            'header' => ['nullable', 'string', 'max:11'],
+            'sender' => ['nullable', 'string', 'max:11'],
         ];
     }
 

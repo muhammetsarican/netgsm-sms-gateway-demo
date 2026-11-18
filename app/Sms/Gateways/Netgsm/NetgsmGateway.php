@@ -15,14 +15,14 @@ use Throwable;
 
 final class NetgsmGateway implements SmsGateway
 {
-    public function __construct(private readonly SmsSend $client, private readonly LoggerInterface $logger, private readonly string $defaultHeader, private readonly string $iysFilter = '0') {}
+    public function __construct(private readonly SmsSend $client, private readonly LoggerInterface $logger, private readonly string $defaultSender, private readonly string $iysFilter = '0') {}
 
     public function send(OutgoingSms $sms): SendResult
     {
         $payload = [
             'message' => $sms->body,
             'no' => array_map(fn (PhoneNumber $phone) => $phone->national(), $sms->recipients),
-            'header' => $sms->header ?? $this->defaultHeader,
+            'header' => $sms->sender ?? $this->defaultSender,
             'filter' => $this->iysFilter,
             'encoding' => self::needsTurkishEncoding($sms->body) ? 'tr' : null,
             'startdate' => '',

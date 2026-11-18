@@ -65,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
         return new NetgsmGateway(
             client: new SmsSend,
             logger: $logger,
-            defaultHeader: $config['header'],
+            defaultSender: $config['header'],
             iysFilter: (string) $config['iys_filter'],
         );
     }

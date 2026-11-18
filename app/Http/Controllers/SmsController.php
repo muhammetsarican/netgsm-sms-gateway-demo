@@ -37,7 +37,7 @@ class SmsController extends Controller
         $message = $queueSingleSms->handle(
             phone: $request->phoneNumber(),
             body: $request->string('message')->toString(),
-            header: $request->input('header'),
+            sender: $request->input('sender'),
             idempotencyKey: $request->header('Idempotency-Key') ?? (string) Str::uuid(),
         );
 

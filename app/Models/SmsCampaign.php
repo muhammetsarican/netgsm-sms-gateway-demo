@@ -12,7 +12,7 @@ class SmsCampaign extends Model
     protected $fillable = [
         'type',
         'body',
-        'header',
+        'sender',
         'total_recipients',
     ];
 

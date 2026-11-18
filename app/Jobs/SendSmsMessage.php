@@ -45,7 +45,7 @@ class SendSmsMessage implements ShouldQueue
             $result = $gateway->send(new OutgoingSms(
                 recipients: [$message->phoneNumber()],
                 body: $message->campaign->body,
-                header: $message->campaign->header,
+                sender: $message->campaign->sender,
             ));
         } catch (GatewayUnavailableException $e) {
             $message->update([

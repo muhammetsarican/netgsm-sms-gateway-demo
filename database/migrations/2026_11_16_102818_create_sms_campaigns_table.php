@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('type', 10);
             $table->text('body');
-            $table->string('header', 11)->nullable();
+            $table->string('sender', 11)->nullable();
             $table->unsignedBigInteger('total_recipients')->default(0);
             $table->timestamps();
 
