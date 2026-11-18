@@ -52,5 +52,5 @@ it('mesaj durumunu sorgulamaya izin verir', function () {
     /** @var TestCase $this */
     $id = $this->postJson('/api/sms', ['phone' => '05321234567', 'message' => 'Merhaba'])->json('data.id');
 
-    $this->getJson("/api/sms/{$id}")->assertOk()->assertJsonPath('data.id', $id)->assertJsonPath('data.status_label','Kuyrukta');
+    $this->getJson("/api/sms/{$id}")->assertOk()->assertJsonPath('data.id', $id)->assertJsonPath('data.status_label', 'Kuyrukta');
 });
