@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         RateLimiter::for('sms-send', function (Request $request) {
-            $phone = PhoneNumber::tryFrom((string) $request->input('phone'))?->value ?? 'invalid';
+            $phone = PhoneNumber::tryFrom((string) $request->input('phone'))->value ?? 'invalid';
 
             return [
                 Limit::perMinute(30)->by('ip:'.$request->ip()),

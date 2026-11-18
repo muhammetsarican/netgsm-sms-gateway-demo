@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\SmsMessage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,16 +18,19 @@ class SmsMessageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var SmsMessage $message */
+        $message = $this->resource;
+
         return [
-            'id' => $this->id,
-            'status' => $this->status->value,
-            'status_label' => $this->status->label(),
-            'phone' => $this->phoneNumber()->masked(),
-            'provider_reference' => $this->provider_reference,
-            'error_code' => $this->error_code,
-            'attempts' => $this->attempts,
-            'sent_at' => $this->sent_at?->toIso8601String(),
-            'created_at' => $this->created_at?->toIso8601String(),
+            'id' => $message->id,
+            'status' => $message->status->value,
+            'status_label' => $message->status->label(),
+            'phone' => $message->phoneNumber()->masked(),
+            'provider_reference' => $message->provider_reference,
+            'error_code' => $message->error_code,
+            'attempts' => $message->attempts,
+            'sent_at' => $message->sent_at?->toIso8601String(),
+            'created_at' => $message->created_at?->toIso8601String(),
         ];
     }
 }

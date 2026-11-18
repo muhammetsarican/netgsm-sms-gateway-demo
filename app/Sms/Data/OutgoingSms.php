@@ -20,12 +20,6 @@ final readonly class OutgoingSms
             throw new InvalidArgumentException('En az bir alıcı gerekli');
         }
 
-        foreach ($recipients as $recipient) {
-            if (! $recipient instanceof PhoneNumber) {
-                throw new InvalidArgumentException('Alıcılar PhoneNumber nesnesi olmalı');
-            }
-        }
-
         if (trim($body) === '') {
             throw new InvalidArgumentException('Mesaj metni boş olamaz');
         }

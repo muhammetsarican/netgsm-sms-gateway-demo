@@ -16,7 +16,7 @@ jobs:
       - name: PHP 8.3 kur
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: "8.3"
           extensions: mbstring, intl, bcmath, pdo_sqlite
           coverage: none
 
@@ -32,7 +32,7 @@ jobs:
         run: vendor/bin/pint --test
 
       - name: Statik analiz (Larastan)
-        run: vendor/bin/phpstan analyse --no-progress
+        run: composer analyse
 
       - name: Testler (Pest)
         run: php artisan test
