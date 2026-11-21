@@ -46,15 +46,18 @@ stateDiagram-v2
     sending --> failed: kalıcı ret (ör. tanımsız başlık)
     sending --> pending: geçici ret (ör. sınır aşımı) → backoff
     sending --> unknown: ağ hatası / tanınmayan yanıt
-    sent --> delivered: teslim raporu (planlandı)
-    unknown --> sent: teslim raporuyla netleşir (planlandı)
+    sent --> delivered: teslim raporu (sms:sync-reports)
+    sent --> failed: teslim raporu (ör. geçersiz numara)
+    unknown --> unknown: bulkid yok, manuel / tarih aralığı sorgusuyla netleşir
 ```
 
 ## Tasarım kararları: neden böyle?
 
 **Sağlayıcı bir arayüzün arkasında.** Uygulama Netgsm'i doğrudan tanımıyor; sadece `SmsGateway` sözleşmesini biliyor. Böylece proje hesap bilgisi olmadan `FakeGateway` ile çalışıyor, testler gerçek API'ye hiç dokunmuyor ve yeni bir sağlayıcı ya da protokol (SOAP) eklemek tek bir sınıf yazmak kadar kolay. Hangi gateway'in kullanılacağına `SMS_DRIVER` ile tek bir yerde (`AppServiceProvider`) karar veriliyor.
 
-**Gateway'in üç sonucu var: kabul, ret, belirsiz.** Netgsm mesajı kabul ettiyse veya açıkça reddettiyse sonuç bellidir (`SendResult`). Ama istek gittikten sonra bağlantı koptuysa ya da yanıt anlaşılamadıysa SMS **gitmiş de olabilir**. Bu durum ayrı bir exception (`GatewayUnavailableException`) ile ifade ediliyor ve mesaj `unknown` olarak işaretleniyor; **tekrar denenmiyor**. Bir SMS'i geç göndermek, aynı SMS'i iki kez göndermekten daha iyidir.
+**Gateway'in üç sonucu var: kabul, ret, belirsiz.** Netgsm mesajı kabul ettiyse veya açıkça reddettiyse sonuç bellidir (`SendResult`). Ama istek gittikten sonra bağlantı koptuysa ya da yanıt anlaşılamadıysa SMS **gitmiş de olabilir**. Bu durum ayrı bir exception (`GatewayUnavailableException`) ile ifade ediliyor ve mesaj `unknown` olarak işaretleniyor; **tekrar denenmiyor**. Bir SMS'i geç göndermek, aynı SMS'i iki kez göndermekten daha iyidir. `unknown` mesajların sağlayıcı referansı (bulkid) olmadığı için teslim raporuyla doğrudan eşleştirilemiyor; tarih aralığı sorgusuyla telefon + zaman eşleştirmesi ya da operasyonel inceleme gerekiyor.
+
+**Teslim raporu ayrı bir arayüz.** `sent`, sadece "Netgsm kabul etti" demek; telefona ulaşıp ulaşmadığı teslim raporundan öğreniliyor. Zamanlanmış `sms:sync-reports` komutu, 1 dakikadan eski ve 3 günden yeni `sent` mesajların raporlarını bulkid ile sorgulayıp `delivered` / `failed` yapıyor. Rapor sorgulama `SmsGateway`'e eklenmedi, ayrı bir `DeliveryReportProvider` arayüzü oldu (Interface Segregation): rapor desteği olmayan bir sağlayıcı boş metot yazmak zorunda kalmıyor. Güncellemeler `WHERE status = 'sent'` koşuluyla yapıldığı için komut iki kez çalışsa da sonuç değişmiyor.
 
 **İdempotency iki katmanlı.**
 
@@ -91,6 +94,7 @@ docker compose up -d          # MySQL 8.4 + Redis 7
 php artisan migrate
 
 composer run dev              # web sunucusu + queue worker + loglar + Vite
+php artisan schedule:work     # (ayrı terminalde) teslim raporu senkronizasyonu
 ```
 
 Varsayılan driver `fake`'tir; SMS gerçekten gönderilmez, `storage/logs/sms-*.log` dosyasına (maskeli olarak) yazılır. Netgsm ile denemek için `.env` içinde `SMS_DRIVER=netgsm` yapıp `NETGSM_USERCODE`, `NETGSM_PASSWORD`, `NETGSM_HEADER` değerlerini girin.
@@ -171,7 +175,10 @@ app/
 
 - [ ] **Toplu gönderim** — numaraları chunk'lara bölüp `Bus::batch` ile kuyruklama, kampanya ilerlemesi.
 - [ ] **Netgsm SOAP/XML gateway** — aynı arayüzün ikinci protokol implementasyonu.
-- [ ] **Teslim raporu** — `unknown` ve `sent` mesajları için periyodik rapor sorgulama + webhook endpoint'i; uzun süre `sending`'de kalan mesajları toplayan temizlik görevi.
+- [x] **Teslim raporu (pull)** — `sms:sync-reports` ile periyodik sorgulama.
+- [ ] **Teslim raporu (push)** — Netgsm'in rapor bildirimlerini alan webhook endpoint'i (sorgulama trafiğini azaltır).
+- [ ] **`unknown` mesajların netleştirilmesi** — tarih aralığı sorgusuyla telefon + zaman eşleştirmesi; uzun süre `sending`'de kalan mesajları toplayan temizlik görevi.
+- [ ] **İstemciye durum bildirimi (webhook)** — şu an istemci durumu `GET /api/sms/{id}` ile sorguluyor (polling). `callback_url` ile HMAC imzalı, kuyruk üzerinden ve retry'lı bildirim gönderilmeli.
 - [ ] **Bakiye ve başlık listesi** — Redis cache ile.
 - [ ] **OTP akışı** — hash'lenmiş kod, süre ve deneme limiti.
 - [ ] **API kimlik doğrulaması** — şu an API anonim; API anahtarı veya Sanctum token.

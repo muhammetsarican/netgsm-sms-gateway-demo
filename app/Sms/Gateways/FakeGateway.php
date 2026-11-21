@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Sms\Gateways;
 
 use App\Sms\Contracts\SmsGateway;
+use App\Sms\Data\DeliveryReport;
 use App\Sms\Data\OutgoingSms;
 use App\Sms\Data\PhoneNumber;
 use App\Sms\Data\SendResult;
+use App\Sms\Enums\MessageStatus;
+use Carbon\CarbonImmutable;
 use Psr\Log\LoggerInterface;
 
 final class FakeGateway implements SmsGateway
@@ -38,6 +41,14 @@ final class FakeGateway implements SmsGateway
     public function sent(): array
     {
         return $this->sent;
+    }
+
+    public function report(string $reference, array $receipients): array
+    {
+        return array_map(
+            fn (PhoneNumber $phone) => new DeliveryReport($phone, MessageStatus::Delivered, reportedAt: CarbonImmutable::now()),
+            $receipients,
+        );
     }
 
     public function name(): string
