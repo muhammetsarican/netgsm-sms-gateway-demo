@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Events\SmsStatusChanged;
 use App\Models\SmsMessage;
 use App\Sms\Contracts\DeliveryReportProvider;
 use App\Sms\Data\DeliveryReport;
@@ -57,15 +58,29 @@ final class SyncDeliveryReports extends Command
                     continue;
                 }
 
-                $updated += SmsMessage::query()
+                $message = SmsMessage::query()
                     ->where('provider_reference', $reference)
                     ->where('phone', $report->phone->value)
+                    ->where('status', MessageStatus::Sent->value)
+                    ->first();
+
+                if ($message === null) {
+                    continue;
+                }
+
+                $affected = SmsMessage::query()
+                    ->whereKey($message->id)
                     ->where('status', MessageStatus::Sent->value)
                     ->update([
                         'status' => $report->status->value,
                         'error_code' => $report->errorCode,
                         'delivered_at' => $report->status === MessageStatus::Delivered ? ($report->reportedAt ?? now()) : null,
                     ]);
+
+                if ($affected === 1) {
+                    SmsStatusChanged::dispatch($message->id, $report->status);
+                    $updated++;
+                }
             }
         }
 

@@ -39,6 +39,7 @@ class SendSmsRequest extends FormRequest
             ],
             'message' => ['required', 'string', 'max:900'],
             'sender' => ['nullable', 'string', 'max:11'],
+            'callback_url' => ['nullable', 'url:https', 'max:2048'],
         ];
     }
 

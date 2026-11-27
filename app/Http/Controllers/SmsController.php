@@ -39,6 +39,7 @@ class SmsController extends Controller
             body: $request->string('message')->toString(),
             sender: $request->input('sender'),
             idempotencyKey: $request->header('Idempotency-Key') ?? (string) Str::uuid(),
+            callbackUrl: $request->input('callback_url')
         );
 
         return SmsMessageResource::make($message)->response()->setStatusCode(202)->header('Idempotent-Replayed', $message->wasRecentlyCreated ? 'false' : 'true');

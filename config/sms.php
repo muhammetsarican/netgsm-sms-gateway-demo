@@ -9,5 +9,6 @@ return [
         'password' => env('NETGSM_PASSWORD'),
         'header' => env('NETGSM_HEADER'),
         'iys_filter' => env('NETGSM_IYS_FILTER', '0'),
+        'webhook_secret' => env('SMS_WEBHOOK_SECRET'),
     ],
 ];

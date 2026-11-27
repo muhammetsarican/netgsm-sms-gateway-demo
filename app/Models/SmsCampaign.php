@@ -13,6 +13,7 @@ class SmsCampaign extends Model
         'type',
         'body',
         'sender',
+        'callback_url'.
         'total_recipients',
     ];
 

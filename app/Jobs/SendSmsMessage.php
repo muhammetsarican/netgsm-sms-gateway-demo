@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Events\SmsStatusChanged;
 use App\Models\SmsMessage;
 use App\Sms\Contracts\SmsGateway;
 use App\Sms\Data\OutgoingSms;
@@ -53,6 +54,8 @@ class SendSmsMessage implements ShouldQueue
                 'error_message' => $e->getMessage(),
             ]);
 
+            SmsStatusChanged::dispatch($message->id, MessageStatus::Unknown);
+
             return;
         }
 
@@ -64,6 +67,8 @@ class SendSmsMessage implements ShouldQueue
                 'error_message' => null,
                 'sent_at' => now(),
             ]);
+
+            SmsStatusChanged::dispatch($message->id, MessageStatus::Sent);
 
             return;
         }
@@ -85,5 +90,7 @@ class SendSmsMessage implements ShouldQueue
             'error_code' => $result->errorCode,
             'error_message' => $result->errorMessage,
         ]);
+
+        SmsStatusChanged::dispatch($message->id, MessageStatus::Failed);
     }
 }

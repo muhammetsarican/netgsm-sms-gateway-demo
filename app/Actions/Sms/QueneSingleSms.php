@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 final class QueneSingleSms
 {
-    public function handle(PhoneNumber $phone, string $body, ?string $sender, string $idempotencyKey): SmsMessage
+    public function handle(PhoneNumber $phone, string $body, ?string $sender, string $idempotencyKey, ?string $callbackUrl = null): SmsMessage
     {
         $key = hash('sha256', $idempotencyKey.'|'.$phone->value);
 
@@ -25,11 +25,12 @@ final class QueneSingleSms
         }
 
         try {
-            $message = DB::transaction(function () use ($phone, $body, $sender, $key): SmsMessage {
+            $message = DB::transaction(function () use ($phone, $body, $sender, $key, $callbackUrl): SmsMessage {
                 $campaign = SmsCampaign::create([
                     'type' => CampaignType::Single,
                     'body' => $body,
                     'sender' => $sender,
+                    'callback_url' => $callbackUrl,
                     'total_receipients' => 1,
                 ]);
 
